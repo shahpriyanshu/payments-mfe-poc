@@ -11,7 +11,7 @@ const devConfig = {
   plugins: [
     new ModuleFederationPlugin(
       {
-        name: 'shell',
+        name: 'container',
         filename:
           'remoteEntry.js',
         remotes: {
