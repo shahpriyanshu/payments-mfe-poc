@@ -1,4 +1,9 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
 import ErrorBoundary from './ErrorBoundary';
 const PaymentsApp = React.lazy(() => import('payments/App'));
 
@@ -8,9 +13,15 @@ function App() {
       <header className="App-header">
         Payments ui
       </header>
-      <ErrorBoundary>
-        <PaymentsApp/>
-      </ErrorBoundary>
+      <Router>
+        <Switch>
+          <Route path="/payments">
+          <ErrorBoundary>
+            <PaymentsApp/>
+          </ErrorBoundary>
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
