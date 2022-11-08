@@ -1,29 +1,26 @@
 import React from 'react';
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
 } from "react-router-dom";
-import ErrorBoundary from './ErrorBoundary';
-const PaymentsApp = React.lazy(() => import('payments/App'));
+import Payments from './payments';
 
-function App() {
+
+const App = () => {
   return (
+    <Router>
     <div className="App">
-      <header className="App-header">
-        Payments ui
-      </header>
-      <Router>
-        <Switch>
-          <Route path="/payments">
-          <ErrorBoundary>
-            <PaymentsApp/>
-          </ErrorBoundary>
-          </Route>
-        </Switch>
-      </Router>
+        <Routes>
+          <Route path="/payments" exact element={<Payments/>}/>
+          <Route path="/" exact element={<Home/>}/>
+        </Routes>
     </div>
+    </Router>
   );
 }
+
+const Home = () => <>Payments UI</>
+  
 
 export default App;
