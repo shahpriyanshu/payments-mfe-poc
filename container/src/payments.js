@@ -6,7 +6,7 @@ const Payments = () => {
     return (
         <>
             <ErrorBoundary>
-                <PaymentsApp/>
+                <PaymentsApp source="web"/>
             </ErrorBoundary>
         </>
     )
