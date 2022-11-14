@@ -77,7 +77,7 @@ function App(props) {
 
   function loadUPIHandlers() {
     var a = window?.JSBridge?.messageFromWebview("send_UPI_handlers");
-    var upiList = a?.length == 0 ? [] : a?.split(",");
+    var upiList =  a && a?.length  ? a?.split(",") : [];
     var dom = "";
     if (upiList.length == 0) {
       dom = '<div class="box">No UPI Apps found on phone.</div>';
