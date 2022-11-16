@@ -6,10 +6,6 @@ function App(props) {
   const [configData, setData] = useState([]);
   const [paymentData, setPaymentData] = useState([])
   const cookies = new Cookies();
-  const customEventHandler =
-    (e) => {
-      console.log('detail', e);
-    }
 
   useEffect(() => {
     if (configData?.token)
@@ -34,7 +30,6 @@ function App(props) {
         },
       });
       const response = await data.json();
-      console.log(response);
       setPaymentData(response?.data?.payments);
     } catch (error) {
       console.log('error while fetching payment methods', error);
@@ -50,33 +45,37 @@ function App(props) {
     }
   }, [window?.appConfig])
 
+  const customEventHandler = (e) => {
+    const parsedData = typeof e.detail === "string" ? JSON.parse(e.detail) : e.detail;
+    setData(parsedData)
+  } 
+
   useEffect(() => {
-    window.addEventListener('customevent', (e) => {
-      console.log('detail', e)
-      const parsedData = typeof e.detail === "string" ? JSON.parse(e.detail) : e.detail;
-      setData(parsedData)
-    })
+    window.addEventListener('customevent', (e) => customEventHandler(e))
     if (props?.source === "web") {
       const configData = cookies.get('config');
-      console.log("configData >>>>", configData)
       if (configData) {
         setData(configData?.detail)
       }
+    } else {
+      //for android
+      window?.JSBridge?.messageFromWebview("webview_loaded");
+      loadUPIHandlers();
+
+      // for IOS 
+      if (window.webkit?.messageHandlers?.webpageResponseHandler) {
+        window.webkit.messageHandlers.webpageResponseHandler.postMessage({
+          "webview_loaded": true
+        });
+      }
     }
 
-    window?.JSBridge?.messageFromWebview("webview_loaded");
-    loadUPIHandlers();
-    if (window.webkit?.messageHandlers?.webpageResponseHandler) {
-      window.webkit.messageHandlers.webpageResponseHandler.postMessage({
-        "webview_loaded": true
-      });
-    }
     return () =>
       window.removeEventListener('customevent', customEventHandler)
   }, []);
 
   function loadUPIHandlers() {
-    var a = window?.JSBridge?.messageFromWebview("send_UPI_handlers");
+    var a = window?.JSBridge?.getUPIHandlers();
     var upiList =  a && a?.length  ? a?.split(",") : [];
     var dom = "";
     if (upiList.length == 0) {
@@ -84,7 +83,7 @@ function App(props) {
     } else {
       for (var i = 0; i < upiList.length; i++) {
         var info = upiList[i].split("|");
-        dom += '<div onClick="window.JSBridge?.openUPIHandler(\'' + info[0] + '\',\'' + info[1] + '\')"><h4><a href="javascript:void(0)">' + info[0] + '</a></h4></div>';
+        dom += '<div onClick="window.JSBridge?.openUPIHandler(\'' + info[0] + '\',\'' + info[1] + '\')"><h4><a href="javascript:void(0)">' + info[2] + '</a></h4></div>';
       }
     }
     document.getElementById("upi").innerHTML = dom;
@@ -117,6 +116,7 @@ function App(props) {
 
             </div>
             : <span>payment methods Loading...</span>}
+            <img src="https://picsum.photos/seed/picsum/200/300"/>
         {configData ?
           <div>
             <b>token</b> {configData.token}<br />
